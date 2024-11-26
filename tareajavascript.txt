@@ -1,0 +1,562 @@
+
+//PREGUNTA 1 IIFE simple
+
+const mensaje = "Hola desde el ámbito global";
+let contador = 10;
+
+console.log("mensaje:", mensaje); // "Hola desde el ámbito global"
+console.log("contador:", contador); // 10
+
+
+(function () {
+  const mensaje = "Hola desde el IIFE";
+  let contador = 42;
+
+  console.log("Dentro del IIFE:");
+  console.log("mensaje:", mensaje); // "Hola desde el IIFE"
+  console.log("contador:", contador); // 42
+})();
+
+
+
+//PREGUNTA 2 Contador básico con IIFE
+
+const counter = (function() {
+    
+    let count = 0;
+
+    return {
+        increment: 	function() {count++;},
+        getCount: 	function() {return count;}
+    };
+})();
+
+
+console.log(counter.getCount()); 	//0
+counter.increment();			//incrementa 
+console.log(counter.getCount());	//1
+counter.increment();			//incrementa
+console.log(counter.getCount());	//2
+
+
+
+//PREGUNTA 3 Objeto de configuración simple
+
+
+const config = (function() {
+  
+    const defaultConfig = {
+        apiUrl: 'https://api.example.com',
+        timeout: 5000,
+        retries: 3
+    };
+
+  
+    return {
+        getConfig: function() 		{return defaultConfig;},
+  // Actualiza la configuración
+        setConfig: function(newConfig) 	{Object.assign(defaultConfig, newConfig);}
+    };
+})();
+
+
+console.log(config.getConfig()); 
+config.setConfig({ timeout: 7000, retries: 5 });
+console.log(config.getConfig());
+
+
+
+//Ejercicios avanzados
+
+
+//PREGUNTA 1.1 Variable privada con IIFE
+
+const module = (function () { let privateVar = 0;
+
+
+  return {
+    getVar: function () {
+      return privateVar; 
+    },
+    setVar: function (value) {
+      if (typeof value === 'number') {
+        privateVar = value; // Establece un nuevo valor para la variable privada
+      } else {
+        console.error("El valor debe ser un número");
+      }
+    }
+  };
+})();
+
+
+console.log(module.getVar()); // 0
+module.setVar(42);            // Establece el valor de la variable privada a 42
+console.log(module.getVar()); // 42
+module.setVar('Hola');        // El valor debe ser un número
+console.log(module.getVar()); // 42
+
+
+
+//PREGUNTA 1.2 Patrón Singleton con IIFE
+
+const Singleton = (function () {
+   
+    let instance;
+
+    function createInstance() {
+        return {
+            name: "Soy la única instancia",
+            sayHello() {
+                console.log("Hola desde Singleton");
+            }
+        };
+    }
+
+    return {
+        getInstance: function () {
+
+            if (!instance) {
+                instance = createInstance();
+            }
+            return instance;
+        }
+    };
+})();
+
+
+const instance1 = Singleton.getInstance();
+const instance2 = Singleton.getInstance();
+
+console.log(instance1 === instance2); 	//true
+instance1.sayHello();			//Hola desde Singleton
+
+
+//PREGUNTA 2 Patrón de módulo
+
+const myModule = (function () {
+
+  const privateVar = "secreto";
+
+
+  function privateMethod() {
+    console.log("Método privado");
+  }
+
+
+  function publicMethod() {
+    console.log("Método público");
+    privateMethod(); 
+    console.log(privateVar);
+  }
+
+
+  return {
+    publicMethod: publicMethod
+  };
+})();
+
+
+myModule.publicMethod();
+
+// Método público
+// Método privado
+// secreto
+
+
+//PREGUNTA 3 Inicialización diferida
+
+const lazyInitializer = (function () {
+
+    let initializedValue;
+
+
+    return {
+        getValue: function () {
+            if (initializedValue === undefined) {
+                console.log("Inicializando valor...");
+                initializedValue = "Este es el valor inicializado";
+            } else {
+                console.log("Valor ya inicializado.");
+            }
+            return initializedValue;
+        }
+    };
+})();
+
+// Uso del módulo
+console.log(lazyInitializer.getValue()); // Inicializando valor... Este es el valor inicializado
+console.log(lazyInitializer.getValue()); // Valor ya inicializado. Este es el valor inicializado
+
+//PREGUNTA 4 Módulo de configuración
+
+const configModule = (function () {
+
+    const config = {};
+
+    // Métodos públicos
+    return {
+  
+        set: function (key, value) {
+            if (typeof key === "string" && key.trim() !== "") {
+                config[key] = value;
+                console.log(`Configuración establecida: ${key} = ${value}`);
+            } else {
+                console.error("La clave debe ser una cadena válida.");
+            }
+        },
+
+  
+        get: function (key) {
+            if (config.hasOwnProperty(key)) {
+                return config[key];
+            } else {
+                console.warn(`La clave "${key}" no existe en la configuración.`);
+                return undefined;
+            }
+        },
+
+    
+        remove: function (key) {
+            if (config.hasOwnProperty(key)) {
+                delete config[key];
+                console.log(`Configuración eliminada: ${key}`);
+            } else {
+                console.warn(`La clave "${key}" no existe en la configuración.`);
+            }
+        },
+
+   
+        list: function () {
+            return { ...config };
+        }
+    };
+})();
+
+
+configModule.set("apiUrl", "https://api.example.com");
+configModule.set("timeout", 5000);
+
+console.log(configModule.get("apiUrl")); // https://api.example.com
+console.log(configModule.get("timeout")); // 5000
+
+configModule.remove("timeout"); // Configuración eliminada: timeout
+console.log(configModule.get("timeout")); // La clave "timeout" no existe en la configuración.
+
+console.log(configModule.list()); // { apiUrl: "https://api.example.com" }
+
+
+//CLOSURES
+//PREGUNTA 1
+
+function createSimpleCounter() {
+	let counter = 0;
+    	return function () {
+        	counter++;
+        	return counter;
+    };
+}
+
+const myCounter = createSimpleCounter();
+
+
+console.log(myCounter()); // 1
+console.log(myCounter()); // 2
+console.log(myCounter()); // 3
+
+
+const anotherCounter = createSimpleCounter();
+console.log(anotherCounter()); // 1
+console.log(myCounter()); // 4
+
+
+//PREUGNTA 2
+
+function greet(name) {
+    
+    return function (message) {
+        console.log(`¡${message}, ${name}!`);
+    };
+}
+
+
+const greetJohn = greet("John");
+greetJohn("Hola"); // ¡Hola, John!
+greetJohn("Buenos dias"); // ¡Buenos dias, John!
+
+const greetAna = greet("Ana");
+greetAna("Hola"); // ¡Hola, Ana!
+greetAna("Bienvenida"); // ¡Bienvenida, Ana!
+
+
+//PREGUNTA 3
+
+function createMultiplier(n) {
+
+    return function (x) {
+        return x * n;
+    };
+}
+
+const double = createMultiplier(2); // Multiplica por 2
+const triple = createMultiplier(3); // Multiplica por 3
+
+console.log(double(5)); // 10
+console.log(double(10)); // 20
+
+console.log(triple(5)); // 15
+console.log(triple(10)); // 30
+
+
+//ADVANCED EXERCISES
+
+//PREGUNTA 1 Función de memorización
+
+function memoize(fn) {
+  
+    const cache = {};
+    return function (arg) {
+        if (cache.hasOwnProperty(arg)) {
+            console.log("Usando resultado cacheado para:", arg);
+            return cache[arg];
+        }
+
+        const result = fn(arg);
+        cache[arg] = result;
+        console.log("Calculando resultado para:", arg);
+        return result;
+    };
+}
+
+
+const slowSquare = (n) => {
+  for (let i = 0; i < 1000000000; i++) {}
+  return n * n;
+};
+
+
+const fastSquare = memoize(slowSquare);
+
+console.log(fastSquare(5)); // Lento en la primera llamada
+console.log(fastSquare(5)); // Rápido en la segunda llamada
+console.log(fastSquare(10)); // Lento para un nuevo argumento
+console.log(fastSquare(10)); // Rápido al estar en caché
+
+
+//PREGUNTA 2 Contador privado con reinicio
+
+function createCounter() {
+
+    let counter = 0;
+
+    return {
+        increment: function () {
+            counter++;
+            console.log(counter); 
+        },
+        reset: function () {
+            counter = 0;
+            console.log(counter);
+        }
+    };
+}
+
+const myCounter = createCounter();
+
+myCounter.increment(); // 1
+myCounter.increment(); // 2
+myCounter.increment(); // 3
+myCounter.reset();     // 0
+myCounter.increment(); // 1
+
+
+//PREGUNTA 3 Función Once
+
+function once(fn) {
+    let hasBeenCalled = false;
+    let result;
+
+    return function (...args) {
+        if (!hasBeenCalled) {
+            result = fn(...args);
+            hasBeenCalled = true;
+        }
+        return result; // Retornar el resultado de la primera invocación
+    };
+}
+
+// Ejemplo de función ejecutar solo una vez
+function greet(name) {
+    console.log(`Hello, ${name}!`);
+    return `Hello, ${name}!`;
+}
+
+
+const greetOnce = once(greet);
+
+console.log(greetOnce("John")); // Hello, John! y devuelve 'Hello, John!'
+console.log(greetOnce("Jane")); // Solo devuelve 'Hello, John!' sin volver a ejecutar la función
+console.log(greetOnce("Alice")); // Solo devuelve 'Hello, John!' sin volver a ejecutar la función
+
+
+//PREGUNTA 4 Función del curry
+
+function curry(fn) {
+   
+    function curried(...args) {
+    
+        if (args.length >= fn.length) {
+            return fn(...args);
+        } else {
+      
+            return function (arg) {
+                return curried(...args, arg);
+            };
+        }
+    }
+
+    return curried;
+}
+
+
+function add(a, b, c) {
+    return a + b + c;
+}
+
+const curriedAdd = curry(add);
+
+console.log(curriedAdd(1)(2)(3)); // 6
+console.log(curriedAdd(1, 2)(3)); // 6
+console.log(curriedAdd(1)(2, 3)); // 6
+
+//PREGUNTA 5 Composición de funciones
+
+
+function compose(...functions) {
+    return function (initialValue) {
+        return functions.reduceRight((acc, fn) => fn(acc), initialValue);
+    };
+}
+
+function add2(x) {
+    return x + 2;
+}
+
+function multiply3(x) {
+    return x * 3;
+}
+
+function subtract1(x) {
+    return x - 1;
+}
+
+const composedFunction = compose(subtract1, add2, multiply3);
+
+console.log(composedFunction(5)); // 16
+
+
+
+
+//PREGUNTA 1 Función antirrebote
+
+
+function withDelay(callback, delay) {
+    setTimeout(callback, delay);
+}
+
+
+withDelay(() => {
+    console.log("Este mensaje aparece después de 2 segundos.");
+}, 2000); // La función se ejecutará después de 2000 ms (2 segundos)
+
+
+//PREGUNTA 2 Función del acelerador
+
+function throttle(fn, interval) {
+  let lastCall = 0;
+
+  return function (...args) {
+    const now = Date.now();
+
+    if (now - lastCall >= interval) {
+      lastCall = now; 
+      fn(...args); 
+    }
+  };
+}
+
+const log = throttle(() => console.log('Throttled!'), 500);
+
+log(); // Inmediatamente imprime "Throttled!"
+log(); // Ignorado por intervalo de 500ms
+setTimeout(log, 600); // Después de 600ms, imprime "Throttled!" nuevamente
+setTimeout(log, 1100); // Ignorado por intervalo de 500ms
+
+
+//PREGUNTA 3 Función de mapa personalizado
+
+function customMap(arr, callback) {
+  const result = [];
+  for (let i = 0; i < arr.length; i++) {
+    result.push(callback(arr[i], i, arr));
+  }
+  return result;
+}
+
+const números = [1, 2, 3];
+const doubled = customMap(números, x => x * 2);
+console.log(doubled); //[2, 4, 6]
+
+
+//PREGUNTA 4 Funciones de composición
+
+function compose(...fns) {
+  return function (value) {
+    return fns.reduceRight((acc, fn) => fn(acc), value);
+  };
+}
+
+const add1 = x => x + 1;
+const double = x => x * 2;
+
+const composed = compose(add1, double);
+console.log(composed(5)); // Salida: 11 (double(5) => 10, add1(10) => 11)
+
+
+//PREGUNTA 5 Solicitud parcial
+
+function partial(fn, ...presetArgs) {
+  return function (...laterArgs) {
+    return fn(...presetArgs, ...laterArgs);
+  };
+}
+
+const add = (a, b, c) => a + b + c;
+const add5 = partial(add, 5);
+
+console.log(add5(10, 15)); // Salida: 30
+
+
+
+CORRECCION DEL EJERCICIO:
+
+
+function fibonacci(n) {
+ 
+  if (n === 0) return 0;
+  if (n === 1) return 1;
+
+  const fib = [0, 1];
+
+  for (let i = 2; i <= n; i++) {
+    fib[i] = fib[i - 1] + fib[i - 2];
+  }
+
+  console.log(fib);
+  return fib[n];
+}
+
+console.log(fibonacci(7)); // Salida: 13
+console.log(fibonacci(0)); // Salida: 0
+console.log(fibonacci(1)); // Salida: 1
+
+
